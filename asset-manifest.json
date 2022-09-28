@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/admin-panel/static/css/main.31d6cfe0.css",
-    "main.js": "/admin-panel/static/js/main.c897731b.js",
+    "main.js": "/admin-panel/static/js/main.287480af.js",
     "index.html": "/admin-panel/index.html",
-    "main.c897731b.js.map": "/admin-panel/static/js/main.c897731b.js.map"
+    "main.287480af.js.map": "/admin-panel/static/js/main.287480af.js.map"
   },
   "entrypoints": [
     "static/css/main.31d6cfe0.css",
-    "static/js/main.c897731b.js"
+    "static/js/main.287480af.js"
   ]
 }
