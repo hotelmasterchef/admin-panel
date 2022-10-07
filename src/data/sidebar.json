@@ -19,6 +19,11 @@
         "name": "Login",
         "icon": "fa fa-circle-o",
         "path": "/login"
+      },
+      {
+        "name": "Settings",
+        "icon": "fa fa-circle-o",
+        "path": "/settings"
       }
     ]
   }
