@@ -19,8 +19,8 @@
   },
   {
     "name": "Update Storage",
-    "icon": "fa fa-list-alt",
-    "path": "/admin-panel/update",
+    "icon": "fa fa-database",
+    "path": "/admin-panel/update-storage",
     "submenu": null
   }
 ]

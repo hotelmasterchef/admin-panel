@@ -10,6 +10,7 @@ import { Snackbar } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import Menus from "./pages/Menu/Menu";
 import Foods from "./pages/Food/Foods";
+import UpdateStrage from "./pages/updateStorage/UpdateStrage";
 
 const App = () => {
   const { loading, setLoading, user, alert, setAlert } = useGlobalContext();
@@ -50,6 +51,7 @@ const App = () => {
             <Route path="/admin-panel/" element={<Dashboard />} />
             <Route path="/admin-panel/menus" element={<Menus />} />
             <Route path="/admin-panel/foods" element={<Foods />} />
+            <Route path="/admin-panel/update-storage" element={<UpdateStrage />} />
             <Route path="/admin-panel/settings" element={<Settings />} />
           </Route>
         </Routes>

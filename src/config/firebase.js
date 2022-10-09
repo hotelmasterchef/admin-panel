@@ -15,6 +15,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 export const auth = firebase.auth();
-export const db = firebase.firestore();
-export const foodsRef = db.collection("Food");
-export const menusRef = db.collection("Menu");
+// export const db = firebase.firestore();
+// export const foodsRef = db.collection("Food");
+// export const menusRef = db.collection("Menu");
