@@ -44,11 +44,11 @@ const App = () => {
       ) : null}
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/admin-panel/login" element={<Login />} />
           <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/menus" element={<Menus />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/admin-panel/" element={<Dashboard />} />
+            <Route path="/admin-panel/menus" element={<Menus />} />
+            <Route path="/admin-panel/settings" element={<Settings />} />
           </Route>
         </Routes>
       </BrowserRouter>
