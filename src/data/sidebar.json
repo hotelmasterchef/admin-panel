@@ -2,13 +2,13 @@
   {
     "name": "Dashboard",
     "icon": "fa fa-dashboard",
-    "path": "/",
+    "path": "/admin-panel",
     "submenu": null
   },
   {
     "name": "Menus",
     "icon": "fa fa-list-alt",
-    "path": "/menus",
+    "path": "/admin-panel/menus",
     "submenu": null
   }
 ]
