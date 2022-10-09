@@ -35,7 +35,7 @@ const Index = () => {
     <div className={`app sidebar-mini ${sideNavToggled ? "sidenav-toggled" : null} `}>
       <header className="app-header">
         <span className="app-header__logo cp" onClick={() => navigate("/")}>
-          Vali Admin
+          Hotel MasterChef
         </span>
         <span
           className="app-sidebar__toggle"
@@ -56,9 +56,9 @@ const Index = () => {
               <i className="fa fa-bell-o fa-lg"></i>
             </a>
             <ul className="app-notification dropdown-menu dropdown-menu-right">
-              <li className="app-notification__title">You have 1 new notifications.</li>
+              <li className="app-notification__title">Notification functionality not started yet.</li>
               <div className="app-notification__content">
-                <li>
+                {/* <li>
                   <a className="app-notification__item" href="javascript:;">
                     <span className="app-notification__icon">
                       <span className="fa-stack fa-lg">
@@ -71,11 +71,11 @@ const Index = () => {
                       <p className="app-notification__meta">2 min ago</p>
                     </div>
                   </a>
-                </li>
+                </li> */}
               </div>
-              <li className="app-notification__footer">
+              {/* <li className="app-notification__footer">
                 <a href="#">See all notifications.</a>
-              </li>
+              </li> */}
             </ul>
           </li>
           <li className="dropdown">
@@ -83,7 +83,7 @@ const Index = () => {
               <i className="fa fa-user fa-lg"></i>
             </a>
             <ul className="dropdown-menu settings-menu dropdown-menu-right">
-              <li>
+              {/* <li>
                 <a className="dropdown-item" href="page-user.html">
                   <i className="fa fa-cog fa-lg"></i> Settings
                 </a>
@@ -92,7 +92,7 @@ const Index = () => {
                 <a className="dropdown-item" href="page-user.html">
                   <i className="fa fa-user fa-lg"></i> Profile
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a className="dropdown-item" href="page-login.html">
                   <i className="fa fa-sign-out fa-lg"></i> Logout

@@ -12,6 +12,14 @@ body {
 .cp {
   cursor: pointer;
 }
+.btn_primary {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+.input_material {
+  outline: var(--primary-color) !important;
+  border: 1px solid var(--primary-color) !important;
+}
 /* loader */
 /* Loader */
 .spanner {

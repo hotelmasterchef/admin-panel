@@ -1,9 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGlobalContext } from "../../contextapi/Context";
+import { auth } from "../../config/firebase";
 
 const Login = () => {
   const navigate = useNavigate();
   const [flip, setFlip] = useState(false);
+  const [email, set_email] = useState("");
+  const [password, set_password] = useState("");
+  const { isLoggedIn, setAlert, setLoading, setUser, setIsLoggedIn } = useGlobalContext();
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn]);
+  const handleSignIn = () => {
+    setLoading(true);
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((res) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Logged in Successfully.",
+        });
+        setUser(res?.user);
+        setIsLoggedIn(true);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
+  };
   return (
     <>
       <section class="material-half-bg">
@@ -11,7 +44,7 @@ const Login = () => {
       </section>
       <section class="login-content">
         <div class="logo">
-          <h1>Vali Admin React</h1>
+          <h1>Hotel MasterChef</h1>
         </div>
         <div class={`login-box ${flip ? "flipped" : null}`}>
           <form class="login-form" action="index.html">
@@ -19,30 +52,24 @@ const Login = () => {
               <i class="fa fa-lg fa-fw fa-user"></i>SIGN IN
             </h3>
             <div class="form-group">
-              <label class="control-label">USERNAME</label>
-              <input class="form-control" type="text" placeholder="Email" autofocus />
+              <label class="control-label">EMAIL</label>
+              <input value={email} onChange={(e) => set_email(e.target.value)} class="form-control" type="text" placeholder="Email" autofocus />
             </div>
             <div class="form-group">
               <label class="control-label">PASSWORD</label>
-              <input class="form-control" type="password" placeholder="Password" />
+              <input value={password} onChange={(e) => set_password(e.target.value)} class="form-control" type="password" placeholder="Password" />
             </div>
             <div class="form-group">
               <div class="utility">
-                <div class="animated-checkbox">
-                  <label>
-                    <input type="checkbox" />
-                    <span class="label-text">Stay Signed in</span>
-                  </label>
-                </div>
-                <p class="semibold-text mb-2">
+                {/* <p class="semibold-text mb-2">
                   <span onClick={() => setFlip(true)} className="cp" data-toggle="flip">
                     Forgot Password ?
                   </span>
-                </p>
+                </p> */}
               </div>
             </div>
             <div class="form-group btn-container">
-              <button class="btn btn-primary btn-block" type="button" onClick={() => navigate("/")}>
+              <button class="btn btn-primary btn-block" type="button" onClick={() => handleSignIn()}>
                 <i class="fa fa-sign-in fa-lg fa-fw"></i>SIGN IN
               </button>
             </div>

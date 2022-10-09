@@ -3,6 +3,7 @@ const AppContext = React.createContext();
 
 const AppProvider = ({ children }) => {
   // global
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({
@@ -23,6 +24,8 @@ const AppProvider = ({ children }) => {
         setUser,
         loading,
         setLoading,
+        isLoggedIn,
+        setIsLoggedIn
       }}
     >
       {children}

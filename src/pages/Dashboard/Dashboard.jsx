@@ -8,7 +8,6 @@ const Dashboard = () => {
           <h1>
             <i className="fa fa-dashboard"></i> Dashboard
           </h1>
-          <p>A free and open source Bootstrap 4 admin template</p>
         </div>
         <ul className="app-breadcrumb breadcrumb">
           <li className="breadcrumb-item">

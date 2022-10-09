@@ -6,25 +6,9 @@
     "submenu": null
   },
   {
-    "name": "Pages",
-    "icon": "fa fa-columns",
-    "path": null,
-    "submenu": [
-      {
-        "name": "Table",
-        "icon": "fa fa-circle-o",
-        "path": "/table"
-      },
-      {
-        "name": "Login",
-        "icon": "fa fa-circle-o",
-        "path": "/login"
-      },
-      {
-        "name": "Settings",
-        "icon": "fa fa-circle-o",
-        "path": "/settings"
-      }
-    ]
+    "name": "Menus",
+    "icon": "fa fa-list-alt",
+    "path": "/menus",
+    "submenu": null
   }
 ]

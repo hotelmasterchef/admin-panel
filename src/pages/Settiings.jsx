@@ -1,5 +1,4 @@
 import React from "react";
-import { toast } from "react-toastify";
 import { useGlobalContext } from "../contextapi/Context";
 
 const Settings = () => {
@@ -9,9 +8,9 @@ const Settings = () => {
       <h2>Settings</h2>
       <div className="tile">
         <p>Notification</p>
-        <button type="button" onClick={() => toast("Alert")}>
+        {/* <button type="button" onClick={() => toast("Alert")}>
           Show
-        </button>
+        </button> */}
       </div>
       <div className="tile">
         <p>Loading</p>
