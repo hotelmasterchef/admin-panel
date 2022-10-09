@@ -1,7 +1,8 @@
 {
-  "name": "vali-admin-react",
+  "name": "hotelmasterchef",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://hotelmasterchef.github.io/admin-panel",
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/lab": "^4.0.0-alpha.57",
@@ -23,7 +24,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "yarn build && gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
