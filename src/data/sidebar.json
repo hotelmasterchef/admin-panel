@@ -10,5 +10,17 @@
     "icon": "fa fa-list-alt",
     "path": "/admin-panel/menus",
     "submenu": null
+  },
+  {
+    "name": "Foods",
+    "icon": "fa fa-cutlery",
+    "path": "/admin-panel/foods",
+    "submenu": null
+  },
+  {
+    "name": "Update Storage",
+    "icon": "fa fa-list-alt",
+    "path": "/admin-panel/update",
+    "submenu": null
   }
 ]

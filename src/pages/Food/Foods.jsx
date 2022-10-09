@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Modal,
@@ -10,17 +10,16 @@ import {
   RadioGroup,
   Radio,
   FormControlLabel,
+  MenuItem,
   InputLabel,
   Input,
   InputAdornment,
-  MenuItem,
 } from "@material-ui/core";
-import { Delete, Add, Edit } from "@material-ui/icons";
-import MaterialTable from "material-table";
-import { makeStyles } from "@material-ui/core/styles";
-import { useGlobalContext } from "../../contextApi/Context";
+// import { Delete, Add, Edit } from "@material-ui/icons";
+import MaterialTable, { MTableToolbar } from "material-table";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { useGlobalContext } from "../../contextapi/Context";
 import { v4 } from "uuid";
-import { foodsRef } from "../../config/firebase";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -44,9 +43,30 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-evenly",
   },
 }));
-
+const CssTextField = withStyles({
+  root: {
+    "& label.Mui-focused": {
+      color: "#009688",
+    },
+    "& .MuiInput-underline:after": {
+      borderBottomColor: "#009688",
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#009688",
+      },
+      "&:hover fieldset": {
+        borderColor: "#009688",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#009688",
+      },
+    },
+  },
+})(TextField);
 const Index = () => {
   const classes = useStyles();
+  const { foods, setFoods, setAlert, setLoading, menus } = useGlobalContext();
   // NOTE: add
   const [addModal, setAddModal] = useState(false);
   const [add_name, setAdd_name] = useState("");
@@ -54,7 +74,6 @@ const Index = () => {
   const [add_menu, setAdd_menu] = useState("");
   const [add_type, setAdd_type] = useState("");
   const [add_price, setAdd_price] = useState("");
-  const { foods, setFoods, isLoggedIn, setAlert, setLoading, menus } = useGlobalContext();
   // NOTE: edit
   const [editModal, setEditModal] = useState({
     state: false,
@@ -71,6 +90,7 @@ const Index = () => {
     state: false,
     data: null,
   });
+
   const addFood = async () => {
     if (add_name === "" || add_url === "" || add_type === "" || add_price === "" || add_menu === "") {
       setAlert({
@@ -82,49 +102,40 @@ const Index = () => {
     }
     setAddModal(false);
     setLoading(true);
-    let id = v4();
-    foodsRef
-      .doc(id)
-      .set({
-        _id: id,
-        name: add_name,
-        image: add_url,
-        size: add_type,
-        price: add_price,
-        menu: add_menu,
-      })
-      .then((docs) => {
-        setAlert({
-          flag: true,
-          type: "success",
-          msg: "😄 Food added successfully.",
-        });
-        setLoading(false);
-        setFoods([
-          ...foods,
-          {
-            _id: id,
-            name: add_name,
-            image: add_url,
-            size: add_type,
-            price: add_price,
-            menu: add_menu,
-          },
-        ]);
-        setAdd_name("");
-        setAdd_url("");
-        setAdd_type("");
-        setAdd_price("");
-        setAdd_menu("");
-      })
-      .catch((err) => {
-        setAlert({
-          flag: true,
-          type: "error",
-          msg: err.message,
-        });
-        setLoading(false);
+    try {
+      setAlert({
+        flag: true,
+        type: "success",
+        msg: "😄 Food added successfully.",
       });
+      setLoading(false);
+      let id = v4();
+      setFoods([
+        ...foods,
+        {
+          _id: id,
+          name: add_name,
+          image: add_url,
+          size: add_type,
+          price: add_price,
+          menu: add_menu,
+        },
+      ]);
+      setAdd_name("");
+      setAdd_url("");
+      setAdd_type("");
+      setAdd_price("");
+      setAdd_menu("");
+    } catch (error) {
+      console.log(error);
+      setAlert({
+        flag: true,
+        type: "error",
+        msg: "Something went wrong. Please try again.",
+      });
+      setLoading(false);
+    }
+    let id = v4();
   };
   const updateFood = (id) => {
     if (edit_name === "" || edit_url === "" || edit_type === "" || edit_price === "" || edit_menu === "") {
@@ -140,48 +151,39 @@ const Index = () => {
       data: null,
     });
     setLoading(true);
-    foodsRef
-      .doc(id)
-      .update({
+    try {
+      setAlert({
+        flag: true,
+        type: "success",
+        msg: "😄 Food updated successfully.",
+      });
+      setLoading(false);
+      let nowFoodIndex = foods?.findIndex((f) => f?._id === id);
+      console.log(nowFoodIndex);
+      let nowFoods = foods;
+      nowFoods[nowFoodIndex] = {
+        _id: id,
         name: edit_name,
         image: edit_url,
         size: edit_type,
         price: edit_price,
         menu: edit_menu,
-      })
-      .then((docs) => {
-        setAlert({
-          flag: true,
-          type: "success",
-          msg: "😄 Food updated successfully.",
-        });
-        setLoading(false);
-        let nowFoodIndex = foods?.findIndex((f) => f?._id === id);
-        console.log(nowFoodIndex);
-        let nowFoods = foods;
-        nowFoods[nowFoodIndex] = {
-          _id: id,
-          name: edit_name,
-          image: edit_url,
-          size: edit_type,
-          price: edit_price,
-          menu: edit_menu,
-        };
-        setFoods([...nowFoods]);
-        setEdit_name("");
-        setEdit_url("");
-        setEdit_type("");
-        setEdit_price("");
-        setEdit_menu("");
-      })
-      .catch((err) => {
-        setAlert({
-          flag: true,
-          type: "error",
-          msg: err.message,
-        });
-        setLoading(false);
+      };
+      setFoods([...nowFoods]);
+      setEdit_name("");
+      setEdit_url("");
+      setEdit_type("");
+      setEdit_price("");
+      setEdit_menu("");
+    } catch (error) {
+      console.log(error);
+      setAlert({
+        flag: true,
+        type: "error",
+        msg: "Something went wrong. Please try again.",
       });
+      setLoading(false);
+    }
   };
   const deleteFood = async (id) => {
     setLoading(true);
@@ -189,36 +191,44 @@ const Index = () => {
       state: false,
       data: null,
     });
-    foodsRef
-      .doc(id)
-      .delete()
-      .then((docs) => {
-        setAlert({
-          flag: true,
-          type: "success",
-          msg: "😄 Food removed successfully.",
-        });
-        setLoading(false);
-        let nowFood = foods?.filter((f) => f?._id !== id);
-        setFoods([...nowFood]);
-      })
-      .catch((err) => {
-        setAlert({
-          flag: true,
-          type: "error",
-          msg: err.message,
-        });
-        setLoading(false);
+    try {
+      setAlert({
+        flag: true,
+        type: "success",
+        msg: "😄 Food removed successfully.",
       });
+      setLoading(false);
+      let nowFood = foods?.filter((f) => f?._id !== id);
+      setFoods([...nowFood]);
+    } catch (error) {
+      console.log(error);
+      setAlert({
+        flag: true,
+        type: "error",
+        msg: "Something went wrong. Please try again.",
+      });
+      setLoading(false);
+    }
   };
   return (
-    <div
-      style={{
-        padding: "20px",
-      }}
-    >
+    <>
+      <div className="app-title">
+        <div>
+          <h1>
+            <i className="fa fa-cutlery"></i> Foods
+          </h1>
+        </div>
+        <ul className="app-breadcrumb breadcrumb">
+          <li className="breadcrumb-item">
+            <i className="fa fa-home fa-lg"></i>
+          </li>
+          <li className="breadcrumb-item">
+            <a href="#">Foods</a>
+          </li>
+        </ul>
+      </div>
       <MaterialTable
-        title="Foods"
+        title=""
         columns={[
           {
             title: "Image",
@@ -236,7 +246,16 @@ const Index = () => {
             ),
           },
           { title: "Name", field: "name" },
-          { title: "Menu", field: "menu" },
+          {
+            title: "Menu",
+            field: "menu",
+            render: (rowData) => {
+              let menuF = menus?.filter((m) => m?._id === rowData?.menu);
+              let v = "";
+              if (menuF?.length > 0) v = menuF[0]?.name;
+              return <p>{v}</p>;
+            },
+          },
           { title: "Size", field: "size" },
           { title: "Price", field: "price" },
         ]}
@@ -250,33 +269,38 @@ const Index = () => {
                     onClick={(event) => props.action.onClick(event, props.data)}
                     size="small"
                     variant="contained"
-                    color="primary"
                     style={{
                       textTransform: "none",
+                      backgroundColor: "#009688",
+                      color: "white",
                     }}
                   >
-                    <Add /> Add Food
+                    <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Add Food
                   </Button>
                 );
               case "edit":
                 return (
-                  <Edit
+                  <span
                     onClick={(event) => props.action.onClick(event, props.data)}
                     style={{
                       cursor: "pointer",
                       margin: "0 10px",
                     }}
-                  />
+                  >
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                  </span>
                 );
               case "delete":
                 return (
-                  <Delete
+                  <span
                     onClick={(event) => props.action.onClick(event, props.data)}
                     style={{
                       cursor: "pointer",
                       margin: "0 10px",
                     }}
-                  />
+                  >
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </span>
                 );
               default:
                 return (
@@ -292,6 +316,11 @@ const Index = () => {
                 );
             }
           },
+          Toolbar: (props) => (
+            <div style={{}}>
+              <MTableToolbar {...props} />
+            </div>
+          ),
         }}
         actions={[
           {
@@ -333,7 +362,7 @@ const Index = () => {
           actionsColumnIndex: -1,
           exportButton: true,
           exportAllData: true,
-          headerStyle: { fontWeight: "bold", color: "white", background: "#3f51b5" },
+          headerStyle: { fontWeight: "bold", color: "white", background: "#009688" },
         }}
       />
       <Modal
@@ -354,7 +383,7 @@ const Index = () => {
               Add Food
             </h2>
             <div className={classes.modalForm}>
-              <TextField
+              <CssTextField
                 required
                 type="text"
                 label="Food Name"
@@ -362,7 +391,7 @@ const Index = () => {
                 value={add_name}
                 onChange={(e) => setAdd_name(e.target.value)}
               />
-              <TextField
+              <CssTextField
                 required
                 type="text"
                 label="Image URL"
@@ -370,7 +399,7 @@ const Index = () => {
                 value={add_url}
                 onChange={(e) => setAdd_url(e.target.value)}
               />
-              <TextField
+              <CssTextField
                 style={{ width: "100%", margin: "0px 0px 20px 0px" }}
                 id="standard-select-menu"
                 select
@@ -378,17 +407,19 @@ const Index = () => {
                 value={add_menu}
                 onChange={(e) => setAdd_menu(e.target.value)}
               >
-                <MenuItem key={"none"} value={"None"}>
-                  None
-                </MenuItem>
                 {menus.map((option) => (
-                  <MenuItem key={option?._id} value={option.name}>
+                  <MenuItem key={option?._id} value={option?._id}>
                     {option.name}
                   </MenuItem>
                 ))}
-              </TextField>
+                <MenuItem key={"none"} value={"None"}>
+                  None
+                </MenuItem>
+              </CssTextField>
               <FormControl fullWidth className={classes.margin}>
-                <InputLabel htmlFor="standard-adornment-amount">Price</InputLabel>
+                <InputLabel htmlFor="standard-adornment-amount" style={{ color: "black" }}>
+                  Price
+                </InputLabel>
                 <Input
                   id="standard-adornment-amount"
                   value={add_price}
@@ -397,10 +428,12 @@ const Index = () => {
                 />
               </FormControl>
               <FormControl component="fieldset" style={{ marginTop: "20px" }}>
-                <FormLabel component="legend">Size</FormLabel>
+                <FormLabel component="legend" style={{ color: "black" }}>
+                  Size
+                </FormLabel>
                 <RadioGroup aria-label="type" name="type" value={add_type} onChange={(e) => setAdd_type(e.target.value)}>
-                  <FormControlLabel value="Half" control={<Radio color="primary" />} label="Half" />
-                  <FormControlLabel value="Full" control={<Radio color="primary" />} label="Full" />
+                  <FormControlLabel value="Half" control={<Radio color="default" />} label="Half" />
+                  <FormControlLabel value="Full" control={<Radio color="default" />} label="Full" />
                 </RadioGroup>
               </FormControl>
             </div>
@@ -408,7 +441,7 @@ const Index = () => {
               <Button variant="contained" onClick={() => setAddModal(false)} color="secondary">
                 Cancel
               </Button>
-              <Button variant="contained" color="primary" onClick={() => addFood()}>
+              <Button variant="contained" className="btn_primary" onClick={() => addFood()}>
                 Save
               </Button>
             </div>
@@ -438,7 +471,7 @@ const Index = () => {
               Edit Food
             </h2>
             <div className={classes.modalForm}>
-              <TextField
+              <CssTextField
                 required
                 type="text"
                 label="Food Name"
@@ -446,7 +479,7 @@ const Index = () => {
                 value={edit_name}
                 onChange={(e) => setEdit_name(e.target.value)}
               />
-              <TextField
+              <CssTextField
                 required
                 type="text"
                 label="Image URL"
@@ -455,7 +488,7 @@ const Index = () => {
                 onChange={(e) => setEdit_url(e.target.value)}
               />
 
-              <TextField
+              <CssTextField
                 style={{ width: "100%", marginBottom: "20px" }}
                 id="standard-select-menu"
                 select
@@ -464,17 +497,19 @@ const Index = () => {
                 onChange={(e) => setEdit_menu(e.target.value)}
                 helperText="Please select menu"
               >
-                <MenuItem key={"none"} value={"None"}>
-                  None
-                </MenuItem>
                 {menus.map((option) => (
-                  <MenuItem key={option?._id} value={option.name}>
+                  <MenuItem key={option?._id} value={option?._id}>
                     {option.name}
                   </MenuItem>
                 ))}
-              </TextField>
+                <MenuItem key={"none"} value={"None"}>
+                  None
+                </MenuItem>
+              </CssTextField>
               <FormControl fullWidth className={classes.margin}>
-                <InputLabel htmlFor="standard-adornment-amount">Price</InputLabel>
+                <InputLabel htmlFor="standard-adornment-amount" style={{ color: "black" }}>
+                  Price
+                </InputLabel>
                 <Input
                   id="standard-adornment-amount"
                   value={edit_price}
@@ -483,10 +518,12 @@ const Index = () => {
                 />
               </FormControl>
               <FormControl component="fieldset" style={{ marginTop: "20px" }}>
-                <FormLabel component="legend">Size</FormLabel>
+                <FormLabel component="legend" style={{ color: "black" }}>
+                  Size
+                </FormLabel>
                 <RadioGroup aria-label="type" name="type" value={edit_type} onChange={(e) => setEdit_type(e.target.value)}>
-                  <FormControlLabel value="Half" control={<Radio color="primary" />} label="Half" />
-                  <FormControlLabel value="Full" control={<Radio color="primary" />} label="Full" />
+                  <FormControlLabel value="Half" control={<Radio color="default" />} label="Half" />
+                  <FormControlLabel value="Full" control={<Radio color="default" />} label="Full" />
                 </RadioGroup>
               </FormControl>
             </div>
@@ -555,7 +592,7 @@ const Index = () => {
           </div>
         </Fade>
       </Modal>
-    </div>
+    </>
   );
 };
 

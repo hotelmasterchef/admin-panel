@@ -51,8 +51,7 @@ const CssTextField = withStyles({
 })(TextField);
 const Index = () => {
   const classes = useStyles();
-  const { foods, setAlert, setLoading } = useGlobalContext();
-  const [menus, setMenus] = useState([]);
+  const { foods, setAlert, setLoading ,menus, setMenus } = useGlobalContext();
   // NOTE: add
   const [addModal, setAddModal] = useState(false);
   const [add_name, setAdd_name] = useState("");

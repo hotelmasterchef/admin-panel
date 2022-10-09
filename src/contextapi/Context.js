@@ -13,6 +13,9 @@ const AppProvider = ({ children }) => {
   });
   const [reload, setReload] = useState(1);
 
+  const [menus, setMenus] = useState([]);
+  const [foods, setFoods] = useState([])
+
   return (
     <AppContext.Provider
       value={{
@@ -25,7 +28,11 @@ const AppProvider = ({ children }) => {
         loading,
         setLoading,
         isLoggedIn,
-        setIsLoggedIn
+        setIsLoggedIn,
+        menus,
+        setMenus,
+        foods,
+        setFoods
       }}
     >
       {children}

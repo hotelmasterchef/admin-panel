@@ -9,6 +9,7 @@ import { useGlobalContext } from "./contextapi/Context";
 import { Snackbar } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import Menus from "./pages/Menu/Menu";
+import Foods from "./pages/Food/Foods";
 
 const App = () => {
   const { loading, setLoading, user, alert, setAlert } = useGlobalContext();
@@ -48,6 +49,7 @@ const App = () => {
           <Route element={<Layout />}>
             <Route path="/admin-panel/" element={<Dashboard />} />
             <Route path="/admin-panel/menus" element={<Menus />} />
+            <Route path="/admin-panel/foods" element={<Foods />} />
             <Route path="/admin-panel/settings" element={<Settings />} />
           </Route>
         </Routes>
