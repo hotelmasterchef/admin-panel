@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import sideBar from "../data/sidebar.json";
 import { useNavigate, Outlet } from "react-router-dom";
+import SecureLS from "secure-ls";
+import { useGlobalContext } from "../contextapi/Context";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { setIsLoggedIn } = useGlobalContext();
   const [sideNavToggled, setSideNavToggled] = useState(false);
   const [activeTab, setActiveTab] = useState("");
   const [open, setOpen] = useState({
@@ -94,9 +97,16 @@ const Index = () => {
                 </a>
               </li> */}
               <li>
-                <a className="dropdown-item" href="page-login.html">
+                <span
+                  className="dropdown-item cp"
+                  onClick={() => {
+                    var ls = new SecureLS({ encodingType: "aes" });
+                    ls.set("7e2bad80-f8a4-4180-9682-1198cbc35725", { data: false });
+                    setIsLoggedIn(false);
+                  }}
+                >
                   <i className="fa fa-sign-out fa-lg"></i> Logout
-                </a>
+                </span>
               </li>
             </ul>
           </li>
@@ -115,7 +125,7 @@ const Index = () => {
           />
           <div>
             <p className="app-sidebar__user-name">Sahoochinmay</p>
-            <p className="app-sidebar__user-designation">Reactjs Developer</p>
+            <p className="app-sidebar__user-designation">Admin</p>
           </div>
         </div>
         <ul className="app-menu">

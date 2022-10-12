@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, Fade, Backdrop, TextField, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel } from "@material-ui/core";
 // import { Delete, Add, Edit } from "@material-ui/icons";
 import MaterialTable, { MTableToolbar } from "material-table";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useGlobalContext } from "../../contextapi/Context";
 import { v4 } from "uuid";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -51,7 +52,8 @@ const CssTextField = withStyles({
 })(TextField);
 const Index = () => {
   const classes = useStyles();
-  const { foods, setAlert, setLoading ,menus, setMenus } = useGlobalContext();
+  const navigate = useNavigate();
+  const { foods, setAlert, setLoading ,menus, setMenus ,isLoggedIn } = useGlobalContext();
   // NOTE: add
   const [addModal, setAddModal] = useState(false);
   const [add_name, setAdd_name] = useState("");
@@ -68,8 +70,12 @@ const Index = () => {
   const [deleteModal, setDeleteModal] = useState({
     state: false,
     data: null,
-  });
-
+  });;
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/admin-panel/");
+    }
+  }, [isLoggedIn]);
   const addFood = async () => {
     setLoading(true);
     try {

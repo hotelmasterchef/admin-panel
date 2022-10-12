@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useGlobalContext } from "../../contextapi/Context";
 
 const UpdateStrage = () => {
-  const { foods, menus } = useGlobalContext();
+  const navigate = useNavigate();
+  const { foods, menus , isLoggedIn } = useGlobalContext();
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/admin-panel/");
+    }
+  }, [isLoggedIn]);
   const downloadFile = async () => {
     // json
     let myData = {

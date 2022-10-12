@@ -1,6 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useGlobalContext } from "../../contextapi/Context";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useGlobalContext();
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/admin-panel/");
+    }
+  }, [isLoggedIn]);
   return (
     <>
       <div className="app-title">

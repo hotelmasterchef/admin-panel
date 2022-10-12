@@ -2,7 +2,7 @@
   {
     "name": "Dashboard",
     "icon": "fa fa-dashboard",
-    "path": "/admin-panel",
+    "path": "/admin-panel/dashboard",
     "submenu": null
   },
   {

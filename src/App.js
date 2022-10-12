@@ -46,9 +46,9 @@ const App = () => {
       ) : null}
       <BrowserRouter>
         <Routes>
-          <Route path="/admin-panel/login" element={<Login />} />
+          <Route path="/admin-panel" element={<Login />} />
           <Route element={<Layout />}>
-            <Route path="/admin-panel/" element={<Dashboard />} />
+            <Route path="/admin-panel/dashboard" element={<Dashboard />} />
             <Route path="/admin-panel/menus" element={<Menus />} />
             <Route path="/admin-panel/foods" element={<Foods />} />
             <Route path="/admin-panel/update-storage" element={<UpdateStrage />} />

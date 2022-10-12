@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalContext } from "../../contextapi/Context";
 import { auth } from "../../config/firebase";
+import SecureLS from "secure-ls";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const Login = () => {
   const { isLoggedIn, setAlert, setLoading, setUser, setIsLoggedIn } = useGlobalContext();
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/");
+      navigate("/admin-panel/dashboard");
     }
   }, [isLoggedIn]);
   const handleSignIn = () => {
@@ -27,6 +28,8 @@ const Login = () => {
         setUser(res?.user);
         setIsLoggedIn(true);
         setLoading(false);
+        var ls = new SecureLS({ encodingType: "aes" });
+        ls.set("7e2bad80-f8a4-4180-9682-1198cbc35725", { data: true });
       })
       .catch((err) => {
         setAlert({
