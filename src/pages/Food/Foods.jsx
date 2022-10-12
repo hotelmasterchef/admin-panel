@@ -21,6 +21,8 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useGlobalContext } from "../../contextapi/Context";
 import { v4 } from "uuid";
 import { useNavigate } from "react-router-dom";
+import SecureLS from "secure-ls";
+import { foodsRef } from "../../config/firebase";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -66,6 +68,7 @@ const CssTextField = withStyles({
   },
 })(TextField);
 const Index = () => {
+  var ls = new SecureLS({ encodingType: "aes" });
   const classes = useStyles();
   const navigate = useNavigate();
   const { foods, setFoods, setAlert, setLoading, menus, isLoggedIn } = useGlobalContext();
@@ -108,40 +111,49 @@ const Index = () => {
     }
     setAddModal(false);
     setLoading(true);
-    try {
-      setAlert({
-        flag: true,
-        type: "success",
-        msg: "😄 Food added successfully.",
-      });
-      setLoading(false);
-      let id = v4();
-      setFoods([
-        ...foods,
-        {
-          _id: id,
-          name: add_name,
-          image: add_url,
-          size: add_type,
-          price: add_price,
-          menu: add_menu,
-        },
-      ]);
-      setAdd_name("");
-      setAdd_url("");
-      setAdd_type("");
-      setAdd_price("");
-      setAdd_menu("");
-    } catch (error) {
-      console.log(error);
-      setAlert({
-        flag: true,
-        type: "error",
-        msg: "Something went wrong. Please try again.",
-      });
-      setLoading(false);
-    }
     let id = v4();
+    foodsRef
+      .doc(id)
+      .set({
+        _id: id,
+        name: add_name,
+        image: add_url,
+        size: add_type,
+        price: add_price,
+        menu: add_menu,
+      })
+      .then((docs) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Food added successfully.",
+        });
+        setLoading(false);
+        setFoods([
+          ...foods,
+          {
+            _id: id,
+            name: add_name,
+            image: add_url,
+            size: add_type,
+            price: add_price,
+            menu: add_menu,
+          },
+        ]);
+        setAdd_name("");
+        setAdd_url("");
+        setAdd_type("");
+        setAdd_price("");
+        setAdd_menu("");
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
   };
   const updateFood = (id) => {
     if (edit_name === "" || edit_url === "" || edit_type === "" || edit_price === "" || edit_menu === "") {
@@ -157,39 +169,48 @@ const Index = () => {
       data: null,
     });
     setLoading(true);
-    try {
-      setAlert({
-        flag: true,
-        type: "success",
-        msg: "😄 Food updated successfully.",
-      });
-      setLoading(false);
-      let nowFoodIndex = foods?.findIndex((f) => f?._id === id);
-      console.log(nowFoodIndex);
-      let nowFoods = foods;
-      nowFoods[nowFoodIndex] = {
-        _id: id,
+    foodsRef
+      .doc(id)
+      .update({
         name: edit_name,
         image: edit_url,
         size: edit_type,
         price: edit_price,
         menu: edit_menu,
-      };
-      setFoods([...nowFoods]);
-      setEdit_name("");
-      setEdit_url("");
-      setEdit_type("");
-      setEdit_price("");
-      setEdit_menu("");
-    } catch (error) {
-      console.log(error);
-      setAlert({
-        flag: true,
-        type: "error",
-        msg: "Something went wrong. Please try again.",
+      })
+      .then((docs) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Food updated successfully.",
+        });
+        setLoading(false);
+        let nowFoodIndex = foods?.findIndex((f) => f?._id === id);
+        console.log(nowFoodIndex);
+        let nowFoods = foods;
+        nowFoods[nowFoodIndex] = {
+          _id: id,
+          name: edit_name,
+          image: edit_url,
+          size: edit_type,
+          price: edit_price,
+          menu: edit_menu,
+        };
+        setFoods([...nowFoods]);
+        setEdit_name("");
+        setEdit_url("");
+        setEdit_type("");
+        setEdit_price("");
+        setEdit_menu("");
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
       });
-      setLoading(false);
-    }
   };
   const deleteFood = async (id) => {
     setLoading(true);
@@ -197,24 +218,27 @@ const Index = () => {
       state: false,
       data: null,
     });
-    try {
-      setAlert({
-        flag: true,
-        type: "success",
-        msg: "😄 Food removed successfully.",
+    foodsRef
+      .doc(id)
+      .delete()
+      .then((docs) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Food removed successfully.",
+        });
+        setLoading(false);
+        let nowFood = foods?.filter((f) => f?._id !== id);
+        setFoods([...nowFood]);
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
       });
-      setLoading(false);
-      let nowFood = foods?.filter((f) => f?._id !== id);
-      setFoods([...nowFood]);
-    } catch (error) {
-      console.log(error);
-      setAlert({
-        flag: true,
-        type: "error",
-        msg: "Something went wrong. Please try again.",
-      });
-      setLoading(false);
-    }
   };
   return (
     <>

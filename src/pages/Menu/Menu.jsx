@@ -6,6 +6,7 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useGlobalContext } from "../../contextapi/Context";
 import { v4 } from "uuid";
 import { useNavigate } from "react-router-dom";
+import { menusRef } from "../../config/firebase";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -53,7 +54,7 @@ const CssTextField = withStyles({
 const Index = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { foods, setAlert, setLoading ,menus, setMenus ,isLoggedIn } = useGlobalContext();
+  const { foods, setAlert, setLoading, menus, setMenus, isLoggedIn } = useGlobalContext();
   // NOTE: add
   const [addModal, setAddModal] = useState(false);
   const [add_name, setAdd_name] = useState("");
@@ -70,50 +71,57 @@ const Index = () => {
   const [deleteModal, setDeleteModal] = useState({
     state: false,
     data: null,
-  });;
+  });
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/admin-panel/");
     }
   }, [isLoggedIn]);
   const addFood = async () => {
-    setLoading(true);
-    try {
-      if (add_name === "" || add_showInHome === "") {
-        setAlert({
-          flag: true,
-          type: "error",
-          msg: "Please enter all mandatory fields.",
-        });
-        return;
-      }
-      setAddModal(false);
-      let id = v4();
-      setMenus([
-        ...menus,
-        {
-          _id: id,
-          name: add_name,
-          showInHome: add_showInHome,
-        },
-      ]);
-      setAlert({
-        flag: true,
-        type: "success",
-        msg: "😄 Menu added successfully.",
-      });
-      setLoading(false);
-      setAdd_name("");
-      setAdd_showInHome("");
-    } catch (error) {
-      console.log(error);
+    if (add_name === "" || add_showInHome === "") {
       setAlert({
         flag: true,
         type: "error",
-        msg: "Something went wrong. Please try again.",
+        msg: "Please enter all mandatory fields.",
       });
-      setLoading(false);
+      return;
     }
+    setAddModal(false);
+    setLoading(true);
+    let id = v4();
+    menusRef
+      .doc(id)
+      .set({
+        _id: id,
+        name: add_name,
+        showInHome: add_showInHome,
+      })
+      .then((docs) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Menu added successfully.",
+        });
+        setLoading(false);
+        setMenus([
+          ...menus,
+          {
+            _id: id,
+            name: add_name,
+            showInHome: add_showInHome,
+          },
+        ]);
+        setAdd_name("");
+        setAdd_showInHome("");
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
   };
   const updateFood = (id) => {
     if (edit_name === "" || edit_showInHome === "") {
@@ -129,32 +137,38 @@ const Index = () => {
       data: null,
     });
     setLoading(true);
-    try {
-      let nowFoodIndex = menus?.findIndex((f) => f?._id === id);
-      let nowFoods = menus;
-      nowFoods[nowFoodIndex] = {
-        _id: id,
+    menusRef
+      .doc(id)
+      .update({
         name: edit_name,
         showInHome: edit_showInHome,
-      };
-      setMenus([...nowFoods]);
-      setLoading(false);
-      setEdit_name("");
-      setEdit_showInHome("");
-      setAlert({
-        flag: true,
-        type: "success",
-        msg: "😄 Menu updated successfully.",
+      })
+      .then((docs) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Menu updated successfully.",
+        });
+        setLoading(false);
+        let nowFoodIndex = menus?.findIndex((f) => f?._id === id);
+        let nowFoods = menus;
+        nowFoods[nowFoodIndex] = {
+          _id: id,
+          name: edit_name,
+          showInHome: edit_showInHome,
+        };
+        setMenus([...nowFoods]);
+        setEdit_name("");
+        setEdit_showInHome("");
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
       });
-    } catch (error) {
-      console.log(error);
-      setAlert({
-        flag: true,
-        type: "error",
-        msg: "Something went wrong. Please try again.",
-      });
-      setLoading(false);
-    }
   };
   const deleteFood = async (id) => {
     setLoading(true);
@@ -162,24 +176,27 @@ const Index = () => {
       state: false,
       data: null,
     });
-    try {
-      let nowFood = menus?.filter((f) => f?._id !== id);
-      setMenus([...nowFood]);
-      setLoading(false);
-      setAlert({
-        flag: true,
-        type: "success",
-        msg: "😄 Food removed successfully.",
+    menusRef
+      .doc(id)
+      .delete()
+      .then((docs) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Menu removed successfully.",
+        });
+        setLoading(false);
+        let nowFood = menus?.filter((f) => f?._id !== id);
+        setMenus([...nowFood]);
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
       });
-    } catch (error) {
-      console.log(error);
-      setAlert({
-        flag: true,
-        type: "error",
-        msg: "Something went wrong. Please try again.",
-      });
-      setLoading(false);
-    }
   };
   return (
     <>

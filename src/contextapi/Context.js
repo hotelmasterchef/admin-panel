@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import SecureLS from "secure-ls";
+import { foodsRef, menusRef } from "../config/firebase";
 
 const AppContext = React.createContext();
 
 const AppProvider = ({ children }) => {
+  var ls = new SecureLS({ encodingType: "aes" });
   // global
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(ls.get("7e2bad80-f8a4-4180-9682-1198cbc35725") ? true : false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({
@@ -20,33 +22,56 @@ const AppProvider = ({ children }) => {
   const [foods, setFoods] = useState([]);
 
   useEffect(() => {
-    var ls = new SecureLS({ encodingType: "aes" });
     let data = ls.get("7e2bad80-f8a4-4180-9682-1198cbc35725");
     if (data) {
-      console.log(data)
       setIsLoggedIn(data?.data);
     } else setIsLoggedIn(false);
   }, []);
   useEffect(() => {
-    if (isLoggedIn) fetchData();
+    if (isLoggedIn) fetchAll();
   }, [isLoggedIn]);
-  const fetchData = async () => {
+  // const response = await axios("https://raw.githubusercontent.com/hotelmasterchefdatabase/data/main/data.json");
+
+  const fetchAll = async () => {
     setLoading(true);
-    try {
-      const response = await axios("https://raw.githubusercontent.com/hotelmasterchefdatabase/data/main/data.json");
-      setLoading(false);
-      setMenus([...response?.menus]);
-      setFoods([...response?.foods]);
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-      setAlert({
-        flag: true,
-        type: "error",
-        msg: "Something went wrong. Please try again.",
+    let arr = [];
+    menusRef
+      .get()
+      .then((docs) => {
+        docs.forEach((doc) => {
+          arr.push(doc.data());
+        });
+        console.log(arr);
+        setMenus([...arr]);
+        setLoading(false);
+        setLoading(true);
+        let arr2 = [];
+        foodsRef
+          .get()
+          .then((docs) => {
+            docs.forEach((doc) => {
+              arr2.push(doc.data());
+            });
+            setFoods([...arr2]);
+            setLoading(false);
+          })
+          .catch((err) => {
+            setAlert({
+              flag: true,
+              type: "error",
+              msg: err.message,
+            });
+            setLoading(false);
+          });
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
       });
-      setLoading(false);
-    }
   };
 
   return (
