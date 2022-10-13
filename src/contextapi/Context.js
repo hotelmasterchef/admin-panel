@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import SecureLS from "secure-ls";
-import { foodsRef, menusRef } from "../config/firebase";
+import { foodsRef, menusRef, settings } from "../config/firebase";
 
 const AppContext = React.createContext();
 
@@ -20,6 +20,7 @@ const AppProvider = ({ children }) => {
 
   const [menus, setMenus] = useState([]);
   const [foods, setFoods] = useState([]);
+  const [popularFoods, setPopularFoods] = useState([]);
 
   useEffect(() => {
     let data = ls.get("7e2bad80-f8a4-4180-9682-1198cbc35725");
@@ -54,6 +55,25 @@ const AppProvider = ({ children }) => {
             });
             setFoods([...arr2]);
             setLoading(false);
+            setLoading(true);
+            let arr3 = [];
+            settings
+              .get()
+              .then((docs3) => {
+                docs3.forEach((doc3) => {
+                  arr3.push(doc3.data());
+                });
+                setPopularFoods(arr3[0]?.data);
+                setLoading(false);
+              })
+              .catch((err) => {
+                setAlert({
+                  flag: true,
+                  type: "error",
+                  msg: err.message,
+                });
+                setLoading(false);
+              });
           })
           .catch((err) => {
             setAlert({
@@ -91,6 +111,8 @@ const AppProvider = ({ children }) => {
         setMenus,
         foods,
         setFoods,
+        popularFoods,
+        setPopularFoods,
       }}
     >
       {children}

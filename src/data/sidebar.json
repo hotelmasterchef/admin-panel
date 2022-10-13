@@ -18,6 +18,18 @@
     "submenu": null
   },
   {
+    "name": "Settings",
+    "icon": "fa fa-cog",
+    "path": null,
+    "submenu": [
+      {
+        "name": "Popular Foods",
+        "icon": "fa fa-circle-o",
+        "path": "/admin-panel/popular-foods"
+      }
+    ]
+  },
+  {
     "name": "Update Storage",
     "icon": "fa fa-database",
     "path": "/admin-panel/update-storage",

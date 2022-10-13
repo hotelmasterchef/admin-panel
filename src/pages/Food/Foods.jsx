@@ -22,7 +22,7 @@ import { useGlobalContext } from "../../contextapi/Context";
 import { v4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import SecureLS from "secure-ls";
-import { foodsRef } from "../../config/firebase";
+import { foodsRef, settings } from "../../config/firebase";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -99,6 +99,12 @@ const Index = () => {
     if (!isLoggedIn) {
       navigate("/admin-panel/");
     }
+    settings
+      .doc("popularFoods")
+      .set({
+        data: ["e", "2"],
+      })
+      .then((docs) => {});
   }, [isLoggedIn]);
   const addFood = async () => {
     if (add_name === "" || add_url === "" || add_type === "" || add_price === "" || add_menu === "") {
