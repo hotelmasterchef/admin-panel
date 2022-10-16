@@ -4,7 +4,7 @@ import { useGlobalContext } from "../../contextapi/Context";
 
 const UpdateStrage = () => {
   const navigate = useNavigate();
-  const { foods, menus , isLoggedIn } = useGlobalContext();
+  const { foods, menus , popularFoods,isLoggedIn } = useGlobalContext();
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/admin-panel/");
@@ -15,6 +15,7 @@ const UpdateStrage = () => {
     let myData = {
       foods: foods,
       menus: menus,
+      popularFoods: popularFoods
     };
     const fileName = "data";
     const json = JSON.stringify(myData);

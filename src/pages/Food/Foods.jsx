@@ -576,7 +576,7 @@ const Index = () => {
               >
                 Cancel
               </Button>
-              <Button variant="contained" color="primary" onClick={() => updateFood(editModal?.data?._id)}>
+              <Button variant="contained" className="btn_primary" onClick={() => updateFood(editModal?.data?._id)}>
                 Update
               </Button>
             </div>
@@ -621,7 +621,7 @@ const Index = () => {
               >
                 Cancel
               </Button>
-              <Button variant="contained" color="primary" onClick={() => deleteFood(deleteModal?.data)}>
+              <Button variant="contained" className="btn_primary" onClick={() => deleteFood(deleteModal?.data)}>
                 Yes
               </Button>
             </div>

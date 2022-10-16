@@ -229,7 +229,7 @@ const Index = () => {
             render: (rowData) => {
               let count = 0;
               foods?.map((f) => {
-                if (f?.menu === rowData?.name) count++;
+                if (f?.menu === rowData?._id) count++;
               });
               return <p>{count}</p>;
             },

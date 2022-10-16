@@ -42,7 +42,6 @@ const AppProvider = ({ children }) => {
         docs.forEach((doc) => {
           arr.push(doc.data());
         });
-        console.log(arr);
         setMenus([...arr]);
         setLoading(false);
         setLoading(true);
