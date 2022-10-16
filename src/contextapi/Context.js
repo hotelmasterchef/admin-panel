@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import SecureLS from "secure-ls";
-import { foodsRef, menusRef, settings } from "../config/firebase";
+import { foodsRef, menusRef, settings, settings2 } from "../config/firebase";
 
 const AppContext = React.createContext();
 
@@ -21,6 +21,8 @@ const AppProvider = ({ children }) => {
   const [menus, setMenus] = useState([]);
   const [foods, setFoods] = useState([]);
   const [popularFoods, setPopularFoods] = useState([]);
+
+  const [acceptOrder, setAcceptOrder] = useState(false);
 
   useEffect(() => {
     let data = ls.get("7e2bad80-f8a4-4180-9682-1198cbc35725");
@@ -64,6 +66,25 @@ const AppProvider = ({ children }) => {
                 });
                 setPopularFoods(arr3[0]?.data);
                 setLoading(false);
+                let arr4 = [];
+                setLoading(true);
+                settings2
+                  .get()  
+                  .then((docs4) => {
+                    setLoading(false);
+                    docs4.forEach((doc4) => {
+                      arr4.push(doc4.data());
+                    });
+                    setAcceptOrder(arr4[0]?.state);
+                  })
+                  .catch((err) => {
+                    setAlert({
+                      flag: true,
+                      type: "error",
+                      msg: err.message,
+                    });
+                    setLoading(false);
+                  });
               })
               .catch((err) => {
                 setAlert({
@@ -92,7 +113,11 @@ const AppProvider = ({ children }) => {
         setLoading(false);
       });
   };
-
+  const updateAcceptOrder = (stat) => {
+    settings2.doc("accpet_order").set({
+      state: stat,
+    });
+  };
   return (
     <AppContext.Provider
       value={{
@@ -112,6 +137,9 @@ const AppProvider = ({ children }) => {
         setFoods,
         popularFoods,
         setPopularFoods,
+        setAcceptOrder,
+        acceptOrder,
+        updateAcceptOrder,
       }}
     >
       {children}
