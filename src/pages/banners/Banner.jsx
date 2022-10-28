@@ -191,10 +191,10 @@ const Banner = () => {
         setAlert({
           flag: true,
           type: "success",
-          msg: "😄 Menu removed successfully.",
+          msg: "😄 Banner removed successfully.",
         });
         setLoading(false);
-        let nowFood = Banner?.filter((f) => f?._id !== id);
+        let nowFood = banners?.filter((f) => f?._id !== id);
         setBanners([...nowFood]);
       })
       .catch((err) => {
