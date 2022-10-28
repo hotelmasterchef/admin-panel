@@ -18,6 +18,12 @@
     "submenu": null
   },
   {
+    "name": "Banners",
+    "icon": "fa fa-picture-o",
+    "path": "/admin-panel/banners",
+    "submenu": null
+  },
+  {
     "name": "Settings",
     "icon": "fa fa-cog",
     "path": null,

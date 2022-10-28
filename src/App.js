@@ -11,6 +11,7 @@ import Menus from "./pages/Menu/Menu";
 import Foods from "./pages/Food/Foods";
 import UpdateStrage from "./pages/updateStorage/UpdateStrage";
 import PopularFoods from "./pages/popularFoods/PopularFoods";
+import Banner from "./pages/banners/Banner";
 
 const App = () => {
   const { loading, setLoading, user, alert, setAlert } = useGlobalContext();
@@ -53,6 +54,7 @@ const App = () => {
             <Route path="/admin-panel/foods" element={<Foods />} />
             <Route path="/admin-panel/update-storage" element={<UpdateStrage />} />
             <Route path="/admin-panel/popular-foods" element={<PopularFoods />} />
+            <Route path="/admin-panel/banners" element={<Banner />} />
           </Route>
         </Routes>
       </BrowserRouter>

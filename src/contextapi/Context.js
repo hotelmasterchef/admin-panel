@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import SecureLS from "secure-ls";
-import { foodsRef, menusRef, settings, settings2 } from "../config/firebase";
+import { foodsRef, menusRef, settings, settings2, bannerRef } from "../config/firebase";
 
 const AppContext = React.createContext();
 
@@ -21,6 +21,8 @@ const AppProvider = ({ children }) => {
   const [menus, setMenus] = useState([]);
   const [foods, setFoods] = useState([]);
   const [popularFoods, setPopularFoods] = useState([]);
+
+  const [banners, setBanners] = useState([]);
 
   const [acceptOrder, setAcceptOrder] = useState(false);
 
@@ -57,25 +59,46 @@ const AppProvider = ({ children }) => {
             setFoods([...arr2]);
             setLoading(false);
             setLoading(true);
-            let arr3 = [];
+            let obj3 = {};
             settings
               .get()
               .then((docs3) => {
                 docs3.forEach((doc3) => {
-                  arr3.push(doc3.data());
+                  obj3[doc3?.id] = doc3.data()?.data;
                 });
-                setPopularFoods(arr3[0]?.data);
+                if (obj3?.popularFoods) {
+                  setPopularFoods(obj3?.popularFoods);
+                } else setPopularFoods([]);
                 setLoading(false);
-                let arr4 = [];
                 setLoading(true);
+                let arr4 = [];
                 settings2
-                  .get()  
+                  .get()
                   .then((docs4) => {
                     setLoading(false);
                     docs4.forEach((doc4) => {
                       arr4.push(doc4.data());
                     });
                     setAcceptOrder(arr4[0]?.state);
+                    setLoading(true);
+                    let arr5 = [];
+                    bannerRef
+                      .get()
+                      .then((docs5) => {
+                        docs5.forEach((doc) => {
+                          arr5.push(doc.data());
+                        });
+                        setLoading(false);
+                        setBanners([...arr5]);
+                      })
+                      .catch((err) => {
+                        setAlert({
+                          flag: true,
+                          type: "error",
+                          msg: err.message,
+                        });
+                        setLoading(false);
+                      });
                   })
                   .catch((err) => {
                     setAlert({
@@ -140,6 +163,8 @@ const AppProvider = ({ children }) => {
         setAcceptOrder,
         acceptOrder,
         updateAcceptOrder,
+        setBanners,
+        banners,
       }}
     >
       {children}
