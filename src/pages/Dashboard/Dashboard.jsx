@@ -2,8 +2,11 @@ import React, { useEffect } from "react";
 import { useGlobalContext } from "../../contextapi/Context";
 import { useNavigate } from "react-router-dom";
 import { Button, Grid, Switch, Typography, withStyles } from "@material-ui/core";
-import { activeOrdersRef } from "../../config/firebase";
+import { activeOrdersRef, processOrdersRef } from "../../config/firebase";
 import MaterialTable, { MTableToolbar } from "material-table";
+import ConfirmModal from "./ConfirmModal";
+import { useState } from "react";
+import { v4 } from "uuid";
 
 const AntSwitch = withStyles((theme) => ({
   root: {
@@ -41,13 +44,33 @@ const AntSwitch = withStyles((theme) => ({
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, setLoading, setAlert, activeOrders, setActiveOrders, foods, menus, acceptOrder, setAcceptOrder, updateAcceptOrder } = useGlobalContext();
+  const {
+    isLoggedIn,
+    setLoading,
+    setAlert,
+    processOrders,
+    setProcessOrders,
+    activeOrders,
+    setActiveOrders,
+    foods,
+    menus,
+    acceptOrder,
+    setAcceptOrder,
+    updateAcceptOrder,
+  } = useGlobalContext();
+  const [confirmModal, setConfirmModal] = useState({
+    state: false,
+    data: null,
+    type: "",
+    msg: "",
+  });
   console.log(activeOrders);
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/admin-panel/");
     } else {
       fetchActiveOrders();
+      fetchProecessing();
     }
   }, [isLoggedIn]);
 
@@ -72,9 +95,124 @@ const Dashboard = () => {
         setLoading(false);
       });
   };
-  const handleAcceptOrder = async () => {};
+  const fetchProecessing = async () => {
+    setLoading(true);
+    let arr = [];
+    processOrdersRef
+      .get()
+      .then((docs) => {
+        docs.forEach((doc) => {
+          arr.push(doc.data());
+        });
+        setProcessOrders([...arr]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
+  };
+  const handleAcceptOrder = async (data) => {
+    setLoading(true);
+    setConfirmModal({
+      state: false,
+      data: null,
+      type: "",
+      msg: "",
+    });
+    let id = v4();
+    console.log(data);
+    processOrdersRef
+      .doc(id)
+      .set({
+        _id: id,
+        address: data?.address,
+        delivery_charge: data?.delivery_charge,
+        items: data?.items,
+        totalPrice: data?.totalPrice,
+      })
+      .then((docs) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Order accepted.",
+        });
+        setProcessOrders([
+          ...processOrders,
+          {
+            _id: id,
+            address: data?.address,
+            delivery_charge: data?.delivery_charge,
+            items: data?.items,
+            totalPrice: data?.totalPrice,
+          },
+        ]);
+        activeOrdersRef
+          .doc(data?._id)
+          .delete()
+          .then((docs) => {
+            setLoading(false);
+            let activeNow = activeOrders?.filter((ao) => ao?._id !== data?._id);
+            setActiveOrders([...activeNow]);
+          });
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
+  };
+  const handleRejectOrder = (data) => {
+    setLoading(true);
+    setConfirmModal({
+      state: false,
+      data: null,
+      type: "",
+      msg: "",
+    });
+    activeOrdersRef
+      .doc(data?._id)
+      .delete()
+      .then((docs) => {
+        setLoading(false);
+        let activeNow = activeOrders?.filter((ao) => ao?._id !== data?._id);
+        setActiveOrders([...activeNow]);
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
+  };
   return (
     <>
+      <ConfirmModal
+        isOpen={confirmModal?.state}
+        handleClose={() =>
+          setConfirmModal({
+            state: false,
+            data: null,
+            type: "",
+          })
+        }
+        data={confirmModal?.data}
+        msg={confirmModal?.msg}
+        type={confirmModal?.type}
+        handleConfirm={(t, data) => {
+          if (t === "accept") handleAcceptOrder(data);
+          else if (t === "reject") handleRejectOrder(data);
+        }}
+      />
       <div className="app-title">
         <div>
           <h1>
@@ -191,8 +329,7 @@ const Dashboard = () => {
                   return (
                     <div
                       style={{
-                        padding: "20px",
-                        paddingLeft: "50px",
+                        padding: "50px",
                       }}
                     >
                       <table
@@ -204,7 +341,15 @@ const Dashboard = () => {
                           <th>Name</th>
                           <th>Size</th>
                           <th>Quantity</th>
-                          <th>Price</th>
+                          <th>Unit Price</th>
+                          <th
+                            align="right"
+                            style={{
+                              textAlign: "right",
+                            }}
+                          >
+                            Total Price
+                          </th>
                         </tr>
                         {rowData?.items?.map((ri) => {
                           return (
@@ -213,18 +358,25 @@ const Dashboard = () => {
                               <td>{ri?.size}</td>
                               <td>{ri?.quantity}</td>
                               <td>{ri?.price}</td>
+                              <td align="right">{ri?.price * ri?.quantity}</td>
                             </tr>
                           );
                         })}
                         <tr>
-                          <td colSpan={4}>
+                          <td colSpan={5}>
                             <hr />
                           </td>
                         </tr>
                         <tr>
-                          <td colSpan={3}></td>
-                          <td>
-                            <h5>Total Price:{rowData?.totalPrice}</h5>
+                          <td colSpan={4}></td>
+                          <td align="right">
+                            <p>Delivery Charge:{rowData?.delivery_charge}</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={4}></td>
+                          <td align="right">
+                            <h5>Grand Total Price:{rowData?.totalPrice}</h5>
                           </td>
                         </tr>
                       </table>
@@ -240,10 +392,10 @@ const Dashboard = () => {
                     return (
                       <Button
                         onClick={(event) => props.action.onClick(event, props.data)}
-                        color="primary"
                         variant="contained"
                         style={{ textTransform: "none", marginRight: "10px" }}
                         size="small"
+                        className="btn_primary"
                       >
                         <i class="fa fa-check" aria-hidden="true"></i>&nbsp;Accept
                       </Button>
@@ -286,12 +438,12 @@ const Dashboard = () => {
                 tooltip: "Accept Order",
                 alignItems: "right",
                 onClick: (event, rowData) => {
-                  // setEditModal({
-                  //   state: true,
-                  //   data: rowData,
-                  // });
-                  // setEdit_name(rowData?.name);
-                  // setEdit_showInHome(rowData?.showInHome);
+                  setConfirmModal({
+                    state: true,
+                    data: rowData,
+                    msg: `Confirm with the customer. Call: ${rowData?.address?.mobile}`,
+                    type: "accept",
+                  });
                 },
               },
               {
@@ -299,10 +451,187 @@ const Dashboard = () => {
                 tooltip: "Reject Order",
                 alignItems: "right",
                 onClick: (event, rowData) => {
-                  // setDeleteModal({
+                  setConfirmModal({
+                    state: true,
+                    data: rowData,
+                    msg: `Inform the customer about rejection. Call: ${rowData?.address?.mobile}`,
+                    type: "reject",
+                  });
+                },
+              },
+            ]}
+            options={{
+              pageSize: 5,
+              actionsColumnIndex: -1,
+              exportButton: true,
+              exportAllData: true,
+              headerStyle: { fontWeight: "bold", color: "white", background: "#009688" },
+            }}
+            onRowClick={(event, rowData, togglePanel) => togglePanel()}
+          />
+        </div>
+        <div className="col-12 mt-5">
+          <MaterialTable
+            title="Pending Orders"
+            columns={[
+              {
+                title: "Name",
+                field: "name",
+                render: (rowData) => {
+                  return <p>{rowData?.address?.name}</p>;
+                },
+              },
+              {
+                title: "Mobile",
+                field: "mobile",
+                render: (rowData) => {
+                  return <p>{rowData?.address?.mobile}</p>;
+                },
+              },
+              {
+                title: "Address",
+                field: "address",
+                render: (rowData) => {
+                  return <p>{rowData?.address?.address}</p>;
+                },
+              },
+            ]}
+            data={processOrders}
+            detailPanel={[
+              {
+                tooltip: "Show Name",
+                render: (rowData) => {
+                  return (
+                    <div
+                      style={{
+                        padding: "50px",
+                      }}
+                    >
+                      <table
+                        style={{
+                          width: "100%",
+                        }}
+                      >
+                        <tr>
+                          <th>Name</th>
+                          <th>Size</th>
+                          <th>Quantity</th>
+                          <th>Unit Price</th>
+                          <th
+                            align="right"
+                            style={{
+                              textAlign: "right",
+                            }}
+                          >
+                            Total Price
+                          </th>
+                        </tr>
+                        {rowData?.items?.map((ri) => {
+                          return (
+                            <tr>
+                              <td>{ri?.name}</td>
+                              <td>{ri?.size}</td>
+                              <td>{ri?.quantity}</td>
+                              <td>{ri?.price}</td>
+                              <td align="right">{ri?.price * ri?.quantity}</td>
+                            </tr>
+                          );
+                        })}
+                        <tr>
+                          <td colSpan={5}>
+                            <hr />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={4}></td>
+                          <td align="right">
+                            <p>Delivery Charge:{rowData?.delivery_charge}</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={4}></td>
+                          <td align="right">
+                            <h5>Grand Total Price:{rowData?.totalPrice}</h5>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  );
+                },
+              },
+            ]}
+            components={{
+              Action: (props) => {
+                switch (props?.action?.icon) {
+                  case "edit":
+                    return (
+                      <Button
+                        onClick={(event) => props.action.onClick(event, props.data)}
+                        variant="contained"
+                        style={{ textTransform: "none", marginRight: "10px" }}
+                        size="small"
+                        className="btn_primary"
+                      >
+                        <i class="fa fa-check" aria-hidden="true"></i>&nbsp;Delivered
+                      </Button>
+                    );
+                  case "delete":
+                    return (
+                      <Button
+                        onClick={(event) => props.action.onClick(event, props.data)}
+                        color="secondary"
+                        variant="contained"
+                        style={{ textTransform: "none", marginRight: "10px" }}
+                        size="small"
+                      >
+                        <i class="fa fa-times" aria-hidden="true"></i>&nbsp;Reject
+                      </Button>
+                    );
+                  default:
+                    return (
+                      <Button
+                        onClick={(event) => props.action.onClick(event, props.data)}
+                        color="primary"
+                        variant="contained"
+                        style={{ textTransform: "none" }}
+                        size="small"
+                      >
+                        default
+                      </Button>
+                    );
+                }
+              },
+              Toolbar: (props) => (
+                <div style={{}}>
+                  <MTableToolbar {...props} />
+                </div>
+              ),
+            }}
+            actions={[
+              {
+                icon: "edit",
+                tooltip: "Order Delivered",
+                alignItems: "right",
+                onClick: (event, rowData) => {
+                  // setConfirmModal({
                   //   state: true,
-                  //   data: rowData?._id,
+                  //   data: rowData,
+                  //   msg: `Confirm with the customer. Call: ${rowData?.address?.mobile}`,
+                  //   type: "accept",
                   // });
+                },
+              },
+              {
+                icon: "delete",
+                tooltip: "Reject Order",
+                alignItems: "right",
+                onClick: (event, rowData) => {
+                  setConfirmModal({
+                    state: true,
+                    data: rowData,
+                    msg: `Inform the customer about rejection. Call: ${rowData?.address?.mobile}`,
+                    type: "reject",
+                  });
                 },
               },
             ]}

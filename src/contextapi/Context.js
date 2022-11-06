@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import SecureLS from "secure-ls";
-import { foodsRef, menusRef, settings, settings2, bannerRef  } from "../config/firebase";
+import { foodsRef, menusRef, settings, settings2, bannerRef } from "../config/firebase";
 
 const AppContext = React.createContext();
 
@@ -25,7 +25,9 @@ const AppProvider = ({ children }) => {
   const [banners, setBanners] = useState([]);
 
   const [acceptOrder, setAcceptOrder] = useState(false);
-  const [activeOrders,setActiveOrders] = useState([])
+  const [activeOrders, setActiveOrders] = useState([]);
+
+  const [processOrders, setProcessOrders] = useState([]);
 
   useEffect(() => {
     let data = ls.get("7e2bad80-f8a4-4180-9682-1198cbc35725");
@@ -167,7 +169,9 @@ const AppProvider = ({ children }) => {
         setBanners,
         banners,
         setActiveOrders,
-        activeOrders
+        activeOrders,
+        processOrders,
+        setProcessOrders,
       }}
     >
       {children}
