@@ -21,6 +21,7 @@ export const foodsRef = db.collection("Food");
 export const menusRef = db.collection("Menu");
 export const bannerRef = db.collection("banner");
 export const settings = db.collection("settings");
+export const ordersRef = db.collection('orders')
 
 
 const firebaseConfig2 = {
@@ -37,3 +38,5 @@ var orderDb = firebase.initializeApp(firebaseConfig2,'other');
 
 export const db2 = orderDb.firestore()
 export const settings2 = db2.collection("settings");
+export const activeOrdersRef = db2.collection('activeOrders')
+export const processOrdersRef = db2.collection('processOrders')

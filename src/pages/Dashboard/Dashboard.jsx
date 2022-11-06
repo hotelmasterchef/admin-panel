@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import { useGlobalContext } from "../../contextapi/Context";
 import { useNavigate } from "react-router-dom";
-import { Grid, Switch, Typography, withStyles } from "@material-ui/core";
+import { Button, Grid, Switch, Typography, withStyles } from "@material-ui/core";
+import { activeOrdersRef } from "../../config/firebase";
+import MaterialTable, { MTableToolbar } from "material-table";
 
 const AntSwitch = withStyles((theme) => ({
   root: {
@@ -39,13 +41,38 @@ const AntSwitch = withStyles((theme) => ({
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, foods, menus, acceptOrder, setAcceptOrder  ,updateAcceptOrder} = useGlobalContext();
-
+  const { isLoggedIn, setLoading, setAlert, activeOrders, setActiveOrders, foods, menus, acceptOrder, setAcceptOrder, updateAcceptOrder } = useGlobalContext();
+  console.log(activeOrders);
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/admin-panel/");
+    } else {
+      fetchActiveOrders();
     }
   }, [isLoggedIn]);
+
+  const fetchActiveOrders = async () => {
+    setLoading(true);
+    let arr = [];
+    activeOrdersRef
+      .get()
+      .then((docs) => {
+        docs.forEach((doc) => {
+          arr.push(doc.data());
+        });
+        setActiveOrders([...arr]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
+  };
+  const handleAcceptOrder = async () => {};
   return (
     <>
       <div className="app-title">
@@ -70,7 +97,7 @@ const Dashboard = () => {
             <div className="info">
               <h4>New Orders</h4>
               <p>
-                <b>0</b>
+                <b>{activeOrders?.length}</b>
               </p>
             </div>
           </div>
@@ -115,15 +142,179 @@ const Dashboard = () => {
               <Grid component="label" container alignItems="center" spacing={1}>
                 <Grid item>Off</Grid>
                 <Grid item>
-                  <AntSwitch checked={acceptOrder} onChange={(e) => {
-                    setAcceptOrder(e.target.checked)
-                    updateAcceptOrder(e.target.checked)
-                  }} name="checkedC" />
+                  <AntSwitch
+                    checked={acceptOrder}
+                    onChange={(e) => {
+                      setAcceptOrder(e.target.checked);
+                      updateAcceptOrder(e.target.checked);
+                    }}
+                    name="checkedC"
+                  />
                 </Grid>
                 <Grid item>On</Grid>
               </Grid>
             </Typography>
           </div>
+        </div>
+        <div className="col-12">
+          <MaterialTable
+            title="New Orders"
+            columns={[
+              {
+                title: "Name",
+                field: "name",
+                render: (rowData) => {
+                  return <p>{rowData?.address?.name}</p>;
+                },
+              },
+              {
+                title: "Mobile",
+                field: "mobile",
+                render: (rowData) => {
+                  return <p>{rowData?.address?.mobile}</p>;
+                },
+              },
+              {
+                title: "Address",
+                field: "address",
+                render: (rowData) => {
+                  return <p>{rowData?.address?.address}</p>;
+                },
+              },
+            ]}
+            data={activeOrders}
+            detailPanel={[
+              {
+                tooltip: "Show Name",
+                render: (rowData) => {
+                  console.log(rowData);
+                  return (
+                    <div
+                      style={{
+                        padding: "20px",
+                        paddingLeft: "50px",
+                      }}
+                    >
+                      <table
+                        style={{
+                          width: "100%",
+                        }}
+                      >
+                        <tr>
+                          <th>Name</th>
+                          <th>Size</th>
+                          <th>Quantity</th>
+                          <th>Price</th>
+                        </tr>
+                        {rowData?.items?.map((ri) => {
+                          return (
+                            <tr>
+                              <td>{ri?.name}</td>
+                              <td>{ri?.size}</td>
+                              <td>{ri?.quantity}</td>
+                              <td>{ri?.price}</td>
+                            </tr>
+                          );
+                        })}
+                        <tr>
+                          <td colSpan={4}>
+                            <hr />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={3}></td>
+                          <td>
+                            <h5>Total Price:{rowData?.totalPrice}</h5>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  );
+                },
+              },
+            ]}
+            components={{
+              Action: (props) => {
+                switch (props?.action?.icon) {
+                  case "edit":
+                    return (
+                      <Button
+                        onClick={(event) => props.action.onClick(event, props.data)}
+                        color="primary"
+                        variant="contained"
+                        style={{ textTransform: "none", marginRight: "10px" }}
+                        size="small"
+                      >
+                        <i class="fa fa-check" aria-hidden="true"></i>&nbsp;Accept
+                      </Button>
+                    );
+                  case "delete":
+                    return (
+                      <Button
+                        onClick={(event) => props.action.onClick(event, props.data)}
+                        color="secondary"
+                        variant="contained"
+                        style={{ textTransform: "none", marginRight: "10px" }}
+                        size="small"
+                      >
+                        <i class="fa fa-times" aria-hidden="true"></i>&nbsp;Reject
+                      </Button>
+                    );
+                  default:
+                    return (
+                      <Button
+                        onClick={(event) => props.action.onClick(event, props.data)}
+                        color="primary"
+                        variant="contained"
+                        style={{ textTransform: "none" }}
+                        size="small"
+                      >
+                        default
+                      </Button>
+                    );
+                }
+              },
+              Toolbar: (props) => (
+                <div style={{}}>
+                  <MTableToolbar {...props} />
+                </div>
+              ),
+            }}
+            actions={[
+              {
+                icon: "edit",
+                tooltip: "Accept Order",
+                alignItems: "right",
+                onClick: (event, rowData) => {
+                  // setEditModal({
+                  //   state: true,
+                  //   data: rowData,
+                  // });
+                  // setEdit_name(rowData?.name);
+                  // setEdit_showInHome(rowData?.showInHome);
+                },
+              },
+              {
+                icon: "delete",
+                tooltip: "Reject Order",
+                alignItems: "right",
+                onClick: (event, rowData) => {
+                  // setDeleteModal({
+                  //   state: true,
+                  //   data: rowData?._id,
+                  // });
+                },
+              },
+            ]}
+            options={{
+              pageSize: 5,
+              actionsColumnIndex: -1,
+              exportButton: true,
+              exportAllData: true,
+              headerStyle: { fontWeight: "bold", color: "white", background: "#009688" },
+            }}
+            onRowClick={(event, rowData, togglePanel) => togglePanel()}
+          />
         </div>
       </div>
     </>
