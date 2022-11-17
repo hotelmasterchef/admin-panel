@@ -37,7 +37,7 @@ const Index = () => {
   return (
     <div className={`app sidebar-mini ${sideNavToggled ? "sidenav-toggled" : null} `}>
       <header className="app-header">
-        <span className="app-header__logo cp" onClick={() => navigate("/")}>
+        <span className="app-header__logo cp" onClick={() => navigate("/admin-panel/")}>
           Hotel MasterChef
         </span>
         <span
@@ -96,15 +96,15 @@ const Index = () => {
                   <i className="fa fa-user fa-lg"></i> Profile
                 </a>
               </li> */}
-              <li>
-                <span
-                  className="dropdown-item cp"
-                  onClick={() => {
-                    var ls = new SecureLS({ encodingType: "aes" });
-                    ls.set("7e2bad80-f8a4-4180-9682-1198cbc35725", { data: false });
-                    setIsLoggedIn(false);
-                  }}
-                >
+              <li
+                onClick={() => {
+                  var ls = new SecureLS({ encodingType: "aes" });
+                  ls.set("7e2bad80-f8a4-4180-9682-1198cbc35725", { data: false });
+                  setIsLoggedIn(false);
+                  navigate("/admin-panel/");
+                }}
+              >
+                <span className="dropdown-item cp">
                   <i className="fa fa-sign-out fa-lg"></i> Logout
                 </span>
               </li>

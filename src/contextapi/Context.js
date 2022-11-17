@@ -8,7 +8,7 @@ const AppContext = React.createContext();
 const AppProvider = ({ children }) => {
   var ls = new SecureLS({ encodingType: "aes" });
   // global
-  const [isLoggedIn, setIsLoggedIn] = useState(ls.get("7e2bad80-f8a4-4180-9682-1198cbc35725") ? true : false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({
@@ -36,6 +36,7 @@ const AppProvider = ({ children }) => {
     } else setIsLoggedIn(false);
   }, []);
   useEffect(() => {
+    console.log(isLoggedIn)
     if (isLoggedIn) fetchAll();
   }, [isLoggedIn]);
   // const response = await axios("https://raw.githubusercontent.com/hotelmasterchefdatabase/data/main/data.json");
