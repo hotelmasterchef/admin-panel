@@ -124,7 +124,7 @@ const Index = () => {
             }}
           />
           <div>
-            <p className="app-sidebar__user-name">Sahoochinmay</p>
+            {/* <p className="app-sidebar__user-name">Sahoochinmay</p> */}
             <p className="app-sidebar__user-designation">Admin</p>
           </div>
         </div>

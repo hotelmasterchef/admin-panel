@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useGlobalContext } from "../../contextapi/Context";
 import { useNavigate } from "react-router-dom";
 import { Button, Grid, Switch, Typography, withStyles } from "@material-ui/core";
-import { activeOrdersRef, processOrdersRef } from "../../config/firebase";
+import { activeOrdersRef, orderHistoryRef, processOrdersRef } from "../../config/firebase";
 import MaterialTable, { MTableToolbar } from "material-table";
 import ConfirmModal from "./ConfirmModal";
 import { useState } from "react";
@@ -63,8 +63,10 @@ const Dashboard = () => {
     data: null,
     type: "",
     msg: "",
+    mode: "",
   });
   console.log(activeOrders);
+  const [counter, setCounter] = useState(60);
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/admin-panel/");
@@ -73,7 +75,20 @@ const Dashboard = () => {
       fetchProecessing();
     }
   }, [isLoggedIn]);
-
+  useEffect(() => {
+    let myInterval = setInterval(() => {
+      if (acceptOrder) {
+        if (counter !== 0) setCounter(counter - 1);
+        else {
+          setCounter(60);
+          fetchActiveOrders();
+        }
+      }
+    }, 1000);
+    return () => {
+      clearInterval(myInterval);
+    };
+  });
   const fetchActiveOrders = async () => {
     setLoading(true);
     let arr = [];
@@ -123,6 +138,7 @@ const Dashboard = () => {
       data: null,
       type: "",
       msg: "",
+      mode: "",
     });
     let id = v4();
     console.log(data);
@@ -176,6 +192,7 @@ const Dashboard = () => {
       data: null,
       type: "",
       msg: "",
+      mode: "",
     });
     activeOrdersRef
       .doc(data?._id)
@@ -184,6 +201,75 @@ const Dashboard = () => {
         setLoading(false);
         let activeNow = activeOrders?.filter((ao) => ao?._id !== data?._id);
         setActiveOrders([...activeNow]);
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
+  };
+  const handleRejectProcess = (data) => {
+    setLoading(true);
+    setConfirmModal({
+      state: false,
+      data: null,
+      type: "",
+      msg: "",
+      mode: "",
+    });
+    processOrdersRef
+      .doc(data?._id)
+      .delete()
+      .then((docs) => {
+        setLoading(false);
+        let activeNow = processOrders?.filter((ao) => ao?._id !== data?._id);
+        setProcessOrders([...activeNow]);
+      })
+      .catch((err) => {
+        setAlert({
+          flag: true,
+          type: "error",
+          msg: err.message,
+        });
+        setLoading(false);
+      });
+  };
+  const handleCompleteProcess = async (data) => {
+    setLoading(true);
+    setConfirmModal({
+      state: false,
+      data: null,
+      type: "",
+      msg: "",
+      mode: "",
+    });
+    let id = v4();
+    orderHistoryRef
+      .doc(id)
+      .set({
+        _id: id,
+        address: data?.address,
+        delivery_charge: data?.delivery_charge,
+        items: data?.items,
+        totalPrice: data?.totalPrice,
+      })
+      .then((docs) => {
+        setAlert({
+          flag: true,
+          type: "success",
+          msg: "😄 Order delivered successfully.",
+        });
+        processOrdersRef
+          .doc(data?._id)
+          .delete()
+          .then((docs) => {
+            setLoading(false);
+            let activeNow = processOrders?.filter((ao) => ao?._id !== data?._id);
+            setProcessOrders([...activeNow]);
+          });
       })
       .catch((err) => {
         setAlert({
@@ -208,9 +294,15 @@ const Dashboard = () => {
         data={confirmModal?.data}
         msg={confirmModal?.msg}
         type={confirmModal?.type}
-        handleConfirm={(t, data) => {
-          if (t === "accept") handleAcceptOrder(data);
-          else if (t === "reject") handleRejectOrder(data);
+        mode={confirmModal?.mode}
+        handleConfirm={(mode, t, data) => {
+          if (mode === "active") {
+            if (t === "accept") handleAcceptOrder(data);
+            else if (t === "reject") handleRejectOrder(data);
+          } else {
+            if (t === "accept") handleCompleteProcess(data);
+            else if (t === "reject") handleRejectProcess(data);
+          }
         }}
       />
       <div className="app-title">
@@ -231,7 +323,7 @@ const Dashboard = () => {
       <div className="row">
         <div className="col-md-6 col-lg-6">
           <div className="widget-small primary coloured-icon">
-            <i className="icon fa fa-bandcamp fa-3x"></i>
+            <i className="icon  fa fa-bell-o fa-3x"></i>
             <div className="info">
               <h4>New Orders</h4>
               <p>
@@ -242,18 +334,18 @@ const Dashboard = () => {
         </div>
         <div className="col-md-6 col-lg-6">
           <div className="widget-small info coloured-icon">
-            <i className="icon fa fa-thumbs-o-up fa-3x"></i>
+            <i className="icon fa fa-clock-o fa-3x"></i>
             <div className="info">
-              <h4>Total Orders</h4>
+              <h4>Pending Orders</h4>
               <p>
-                <b>0</b>
+                <b>{processOrders?.length}</b>
               </p>
             </div>
           </div>
         </div>
         <div className="col-md-6 col-lg-6">
           <div className="widget-small warning coloured-icon">
-            <i className="icon fa fa-files-o fa-3x"></i>
+            <i className="icon fa fa-list-alt fa-3x"></i>
             <div className="info">
               <h4>Total Menus</h4>
               <p>
@@ -264,7 +356,7 @@ const Dashboard = () => {
         </div>
         <div className="col-md-6 col-lg-6">
           <div className="widget-small danger coloured-icon">
-            <i className="icon fa fa-star fa-3x"></i>
+            <i className="icon fa fa-cutlery fa-3x"></i>
             <div className="info">
               <h4>Total Foods</h4>
               <p>
@@ -273,7 +365,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="col">
+        <div className="col-8">
           <div className="tile p-md-5 d-flex justify-content-between align-items-center ">
             <h3>Accept Order</h3>
             <Typography component="div">
@@ -292,6 +384,11 @@ const Dashboard = () => {
                 <Grid item>On</Grid>
               </Grid>
             </Typography>
+          </div>
+        </div>
+        <div className="col-4">
+          <div className="tile p-md-5 d-flex justify-content-center align-items-center">
+            <h4>{counter}</h4>
           </div>
         </div>
         <div className="col-12">
@@ -332,6 +429,7 @@ const Dashboard = () => {
                         padding: "50px",
                       }}
                     >
+                      <p>Date: <b>{rowData?.date}</b></p>
                       <table
                         style={{
                           width: "100%",
@@ -377,6 +475,19 @@ const Dashboard = () => {
                           <td colSpan={4}></td>
                           <td align="right">
                             <h5>Grand Total Price:{rowData?.totalPrice}</h5>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={4}></td>
+                          <td align="right">
+                            <button
+                              onClick={() => {
+                                sessionStorage.setItem("orderBill", JSON.stringify(rowData));
+                                navigate("/admin-panel/download");
+                              }}
+                            >
+                              Download Invoice
+                            </button>
                           </td>
                         </tr>
                       </table>
@@ -443,6 +554,7 @@ const Dashboard = () => {
                     data: rowData,
                     msg: `Confirm with the customer. Call: ${rowData?.address?.mobile}`,
                     type: "accept",
+                    mode: "active",
                   });
                 },
               },
@@ -456,6 +568,7 @@ const Dashboard = () => {
                     data: rowData,
                     msg: `Inform the customer about rejection. Call: ${rowData?.address?.mobile}`,
                     type: "reject",
+                    mode: "active",
                   });
                 },
               },
@@ -554,6 +667,19 @@ const Dashboard = () => {
                             <h5>Grand Total Price:{rowData?.totalPrice}</h5>
                           </td>
                         </tr>
+                        <tr>
+                          <td colSpan={4}></td>
+                          <td align="right">
+                            <button
+                              onClick={() => {
+                                sessionStorage.setItem("orderBill", JSON.stringify(rowData));
+                                navigate("/admin-panel/download");
+                              }}
+                            >
+                              Download Invoice
+                            </button>
+                          </td>
+                        </tr>
                       </table>
                     </div>
                   );
@@ -613,12 +739,13 @@ const Dashboard = () => {
                 tooltip: "Order Delivered",
                 alignItems: "right",
                 onClick: (event, rowData) => {
-                  // setConfirmModal({
-                  //   state: true,
-                  //   data: rowData,
-                  //   msg: `Confirm with the customer. Call: ${rowData?.address?.mobile}`,
-                  //   type: "accept",
-                  // });
+                  setConfirmModal({
+                    state: true,
+                    data: rowData,
+                    msg: `Confirm with the delivery boy.`,
+                    type: "accept",
+                    mode: "process",
+                  });
                 },
               },
               {
@@ -631,6 +758,7 @@ const Dashboard = () => {
                     data: rowData,
                     msg: `Inform the customer about rejection. Call: ${rowData?.address?.mobile}`,
                     type: "reject",
+                    mode: "process",
                   });
                 },
               },

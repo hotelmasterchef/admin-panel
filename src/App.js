@@ -12,6 +12,9 @@ import Foods from "./pages/Food/Foods";
 import UpdateStrage from "./pages/updateStorage/UpdateStrage";
 import PopularFoods from "./pages/popularFoods/PopularFoods";
 import Banner from "./pages/banners/Banner";
+import Orders from "./pages/orders/Orders";
+import Download from "./pages/download/Download";
+import Preference from "./pages/preference/Preference";
 
 const App = () => {
   const { loading, setLoading, user, alert, setAlert } = useGlobalContext();
@@ -55,6 +58,9 @@ const App = () => {
             <Route path="/admin-panel/update-storage" element={<UpdateStrage />} />
             <Route path="/admin-panel/popular-foods" element={<PopularFoods />} />
             <Route path="/admin-panel/banners" element={<Banner />} />
+            <Route path="/admin-panel/orders" element={<Orders />} />
+            <Route path="/admin-panel/download" element={<Download />} />
+            <Route path="/admin-panel/preference" element={<Preference />} />
           </Route>
         </Routes>
       </BrowserRouter>

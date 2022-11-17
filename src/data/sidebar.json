@@ -24,6 +24,12 @@
     "submenu": null
   },
   {
+    "name": "Orders",
+    "icon": "fa fa-bell-o",
+    "path": "/admin-panel/orders",
+    "submenu": null
+  },
+  {
     "name": "Settings",
     "icon": "fa fa-cog",
     "path": null,
@@ -32,6 +38,11 @@
         "name": "Popular Foods",
         "icon": "fa fa-circle-o",
         "path": "/admin-panel/popular-foods"
+      },
+      {
+        "name": "Preference",
+        "icon": "fa fa-circle-o",
+        "path": "/admin-panel/preference"
       }
     ]
   },

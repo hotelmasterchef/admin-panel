@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-evenly",
   },
 }));
-const ConfirmModal = ({ isOpen, handleClose, msg, handleConfirm, type, data }) => {
+const ConfirmModal = ({ isOpen, handleClose, msg, handleConfirm, mode, type, data }) => {
   const classes = useStyles();
   return (
     <Modal
@@ -58,7 +58,7 @@ const ConfirmModal = ({ isOpen, handleClose, msg, handleConfirm, type, data }) =
             <Button variant="contained" onClick={handleClose} color="secondary">
               Cancel
             </Button>
-            <Button variant="contained" className="btn_primary" onClick={() => handleConfirm(type, data)}>
+            <Button variant="contained" className="btn_primary" onClick={() => handleConfirm(mode, type, data)}>
               Confirm
             </Button>
           </div>

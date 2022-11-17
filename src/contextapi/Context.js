@@ -28,7 +28,7 @@ const AppProvider = ({ children }) => {
   const [activeOrders, setActiveOrders] = useState([]);
 
   const [processOrders, setProcessOrders] = useState([]);
-
+  const [delivery, setDelivery] = useState("");
   useEffect(() => {
     let data = ls.get("7e2bad80-f8a4-4180-9682-1198cbc35725");
     if (data) {
@@ -83,6 +83,7 @@ const AppProvider = ({ children }) => {
                       arr4.push(doc4.data());
                     });
                     setAcceptOrder(arr4[0]?.state);
+                    setDelivery(arr4[1]?.state);
                     setLoading(true);
                     let arr5 = [];
                     bannerRef
@@ -172,6 +173,8 @@ const AppProvider = ({ children }) => {
         activeOrders,
         processOrders,
         setProcessOrders,
+        setDelivery,
+        delivery,
       }}
     >
       {children}
