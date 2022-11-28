@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalContext } from "../../contextapi/Context";
+// import ViedoNow from '../../assets/AdminPanel.mp4'
 
 const UpdateStrage = () => {
   const navigate = useNavigate();
@@ -69,11 +70,10 @@ const UpdateStrage = () => {
           </button>
         </div>
         <video width="100%" height="500" controls>
-          <source src="./Videos/video1.mp4" type="video/mp4" />
+          <source src="./assets/gk.mp4" type="video/mp4" />
         </video>
       </div>
     </>
   );
 };
-
 export default UpdateStrage;

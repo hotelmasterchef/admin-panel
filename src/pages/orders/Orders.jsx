@@ -88,6 +88,9 @@ const Orders = () => {
                     padding: "50px",
                   }}
                 >
+                  <p>
+                    Date: <b>{rowData?.date}</b>
+                  </p>
                   <table
                     style={{
                       width: "100%",
