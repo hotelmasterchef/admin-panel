@@ -150,7 +150,7 @@ const Dashboard = () => {
         delivery_charge: data?.delivery_charge,
         items: data?.items,
         totalPrice: data?.totalPrice,
-        date: data?.date
+        date: data?.date,
       })
       .then((docs) => {
         setAlert({
@@ -166,7 +166,7 @@ const Dashboard = () => {
             delivery_charge: data?.delivery_charge,
             items: data?.items,
             totalPrice: data?.totalPrice,
-            date: data?.date
+            date: data?.date,
           },
         ]);
         activeOrdersRef
@@ -257,7 +257,7 @@ const Dashboard = () => {
         delivery_charge: data?.delivery_charge,
         items: data?.items,
         totalPrice: data?.totalPrice,
-        date: data?.date
+        date: data?.date,
       })
       .then((docs) => {
         setAlert({
@@ -432,7 +432,9 @@ const Dashboard = () => {
                         padding: "50px",
                       }}
                     >
-                      <p>Date: <b>{rowData?.date}</b></p>
+                      <p>
+                        Date: <b>{rowData?.date}</b>
+                      </p>
                       <table
                         style={{
                           width: "100%",
@@ -477,7 +479,7 @@ const Dashboard = () => {
                         <tr>
                           <td colSpan={4}></td>
                           <td align="right">
-                            <h5>Grand Total Price:{rowData?.totalPrice}</h5>
+                            <h5>Grand Total Price:{rowData?.totalPrice + rowData?.delivery_charge}</h5>
                           </td>
                         </tr>
                         <tr>
@@ -623,7 +625,9 @@ const Dashboard = () => {
                         padding: "50px",
                       }}
                     >
-                      <p>Date: <b>{rowData?.date}</b></p>
+                      <p>
+                        Date: <b>{rowData?.date}</b>
+                      </p>
                       <table
                         style={{
                           width: "100%",
@@ -668,7 +672,7 @@ const Dashboard = () => {
                         <tr>
                           <td colSpan={4}></td>
                           <td align="right">
-                            <h5>Grand Total Price:{rowData?.totalPrice}</h5>
+                            <h5>Grand Total Price:{rowData?.totalPrice + rowData?.delivery_charge}</h5>
                           </td>
                         </tr>
                         <tr>

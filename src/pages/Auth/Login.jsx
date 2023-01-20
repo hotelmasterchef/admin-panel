@@ -10,6 +10,7 @@ const Login = () => {
   const [email, set_email] = useState("");
   const [password, set_password] = useState("");
   const { isLoggedIn, setAlert, setLoading, setUser, setIsLoggedIn } = useGlobalContext();
+  const [showPass, setShowPass] = useState(false);
   useEffect(() => {
     if (isLoggedIn) {
       navigate("/admin-panel/dashboard");
@@ -60,10 +61,21 @@ const Login = () => {
             </div>
             <div class="form-group">
               <label class="control-label">PASSWORD</label>
-              <input value={password} onChange={(e) => set_password(e.target.value)} class="form-control" type="password" placeholder="Password" />
+              <input
+                value={password}
+                onChange={(e) => set_password(e.target.value)}
+                class="form-control"
+                type={showPass ? "text" : "password"}
+                placeholder="Password"
+              />
             </div>
             <div class="form-group">
               <div class="utility">
+                <div>
+                  <input type="checkbox" id="show_password_input" onChange={(e) => setShowPass(e.target.checked)} />
+                  &nbsp;Show Password
+                </div>
+                <div></div>
                 {/* <p class="semibold-text mb-2">
                   <span onClick={() => setFlip(true)} className="cp" data-toggle="flip">
                     Forgot Password ?

@@ -135,7 +135,7 @@ const Orders = () => {
                     <tr>
                       <td colSpan={4}></td>
                       <td align="right">
-                        <h5>Grand Total Price:{rowData?.totalPrice}</h5>
+                        <h5>Grand Total Price:{rowData?.totalPrice + rowData?.delivery_charge}</h5>
                       </td>
                     </tr>
                     <tr>
